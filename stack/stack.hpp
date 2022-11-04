@@ -34,30 +34,42 @@ class Stack{
 template <typename T>
 bool Stack<T>::isEmpty() const{
     //TODO
-    return true;
+    return current == -1;
 }
 
 template <typename T>
 bool Stack<T>::isFull() const{
     //TODO
-    return true;
+    return current == size - 1;
 }
 
 template <typename T>
 T Stack<T>::top() const{
     //TODO
-    return NULL;
+    return array[current];
 }
 
 template <typename T>
 T Stack<T>::pop(){
     //TODO
-    return NULL;
+    current--;
+    return array[current + 1];
 }
 
 template <typename T>
 void Stack<T>::push(const T& item){
     //TODO
+    if (isFull()){
+    	T* newArray = new T[size * 2];
+    	for (int i = 0; i < size){
+    		newArray[i] = array[i];
+		}
+		size *= 2;
+        delete [] newArray;
+		array = newArray;
+	}
+	
+	array[++current] = *item;
     return;
 }
 
