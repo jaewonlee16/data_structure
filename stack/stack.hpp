@@ -61,15 +61,15 @@ void Stack<T>::push(const T& item){
     //TODO
     if (isFull()){
     	T* newArray = new T[size * 2];
-    	for (int i = 0; i < size){
+    	for (int i = 0; i < size; i++){
     		newArray[i] = array[i];
 		}
 		size *= 2;
-        delete [] newArray;
+        delete [] array;
 		array = newArray;
 	}
 	
-	array[++current] = *item;
+	array[++current] = item;
     return;
 }
 

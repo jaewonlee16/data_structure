@@ -105,23 +105,31 @@ int Queue<T>::top(){
 template <typename T>
 T Queue<T>::dequeue(){
     //TODO
+    T value;
     if (front == rear){
-    	// do something
-    	
+    	value = array[front].value;
+        rear--;
     	empty = true;
 	}
-    return NULL;
+    else{
+        int index = top();
+        value = array[index].value;
+        while (index != rear){
+            array[index] = array[index + 1];
+            index = (index + 1) % size;
+        }
+        rear--;
+    }
+    return value;
 }
 
 template <typename T>
 bool Queue<T>::isFull(){
     //TODO
-    if (front < rear){
-    	if (!empty && front == 0 && rear == size - 1)
-    		return true;
-	}
-	else if (rear + 1 == front)
-		return true;
-	else	
+    if (empty)
     	return false;
+    else if ((rear + 1) % size == front)
+    	return true;
+    
+    return false;
 }
