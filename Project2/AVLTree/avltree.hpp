@@ -95,7 +95,8 @@ bool AVLTree<T,U>::remove(const T& key) {
 }
 
 
-int maxHeight(const AVLNode<T,U>*& node1, const AVLNode<T,U>*& node2){
+template<typename T, typename U>
+int maxHeight(const AVLNode<T,U>* node1, const AVLNode<T,U>* node2){
     int height1, height2;
     if (node1 == nullptr)
         height1 = 0;
@@ -118,13 +119,15 @@ int maxHeight(const AVLNode<T,U>*& node1, const AVLNode<T,U>*& node2){
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::rotate_left(AVLNode<T,U>*& node){
     //TODO    
-    AVLNode* tmp = node->right;
+    std::cout << "started left rotate key: " << node->key << std::endl;
+    AVLNode<T, U>* tmp = node->right;
     node->right = tmp->left;
     tmp->left = node;
 
     // change heights
     node->height = maxHeight(node->left, node->right) + 1;
     tmp->height = maxHeight(tmp->left, tmp->right) + 1;
+    // std::cout << "finished left rotate key: " << node->key << std::endl;
     return tmp;
 
 }
@@ -133,13 +136,15 @@ template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::rotate_right(AVLNode<T,U>*& node){
     //TODO
     
-    AVLNode* tmp = node->left;
+    std::cout << "started right rotate key: " << node->key << std::endl;
+    AVLNode<T, U>* tmp = node->left;
     node->left = tmp->right;
     tmp->right = node;
 
     // change heights
     node->height = maxHeight(node->left, node->right) + 1;
     tmp->height = maxHeight(tmp->left, tmp->right) + 1;
+    // std::cout << "finished right rotate key: " << node->key << std::endl;
     return tmp;
 
 }
@@ -148,10 +153,11 @@ template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& value) {
     //TODO
     if (node == nullptr){
-        AVLNode<T, U>* newNode = new AVLNode<T, U>;
-        newNode->key = key;
-        newNode->value = value;
-        newNode->height = 1;
+        AVLNode<T,U>* newNode = new AVLNode<T, U>(key, value);
+        node = newNode;
+        std::cout << "new Node generated: " << node->key << std::endl;
+        return node;
+        
     }
     else if(key < node->key){
         node->left = insert(node->left, key, value);
@@ -161,26 +167,32 @@ AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& v
     }
 
     node->height = maxHeight(node->left, node->right) + 1;
-
+    // std::cout << "finished changing height after new Node generated" << std::endl;
 
     int balanceDifference = getBalance(node);
     //right-left
     if (balanceDifference < -1 && key < node->right->key){
+        std::cout  << "case: (right, left)" << std::endl;
         node->right = rotate_right(node->right);
         node = rotate_left(node);
     }
     //right-right
-    else if (balanceDifference < -1 && key > node->right->key)
+    else if (balanceDifference < -1 && key > node->right->key){
+        std::cout  << "case: (right, right)" << std::endl;
         node = rotate_left(node);
+    }
     //left-right
-    else if (balanceDifference > -1 && key > node->left->key){
+    else if (balanceDifference > 1 && key > node->left->key){
+        std::cout  << "case: (left, right)" << std::endl;
         node->left = rotate_left(node->left);
         node = rotate_right(node);
     }
-    //right-left
-    else if (balanceDifference > -1 && key < node->left->key)
+    //left-left
+    else if (balanceDifference > 1 && key < node->left->key){
+        std::cout  << "case: (left, left)" << std::endl;
         node = rotate_right(node);
-
+    }
+    // std::cout << "finished Balancing" << std::endl;
     return node;
 }
 
@@ -188,12 +200,13 @@ template<typename T, typename U>
 U AVLTree<T,U>::search(AVLNode<T,U>*& node, const T& key) {
     //TODO
     //return NULL if there are no such key, return value if there is
-
+    return node->value;
 }
 
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::remove(AVLNode<T,U>*& node, const T& key) {
     //TODO
+    return node;
 }
 
 template<typename T, typename U>
@@ -201,6 +214,6 @@ void AVLTree<T,U>::removeall(AVLNode<T,U>*& node) {
     //TODO
     //for destructor
         
-    }
+    return;
     
 }
