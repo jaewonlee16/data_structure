@@ -31,10 +31,10 @@ int main () {
     tree.insert(33450, "dobongdong");
    
     tree.insert(25234, "samseongdong");    
-    // tree.remove(54312);
+    tree.remove(54312);
     tree.insert(54155, "gurodong");
     tree.insert(51211, "banghwadong");
-    // tree.remove(11243);
+    tree.remove(11243);
     
     finish_insert_remove = clock();
 

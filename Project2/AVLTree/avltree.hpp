@@ -63,6 +63,7 @@ class AVLTree {
         AVLNode<T,U>* remove(AVLNode<T,U>*& node, const T& key);
         void removeall(AVLNode<T,U>*& node);
         void makeBalance(AVLNode<T,U>*& node, const T& key);
+        void normalBSTRemove(AVLNode<T,U>*& deleteNode);
 
 };
 
@@ -120,7 +121,7 @@ int maxHeight(const AVLNode<T,U>* node1, const AVLNode<T,U>* node2){
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::rotate_left(AVLNode<T,U>*& node){
     //TODO    
-    std::cout << "started left rotate key: " << node->key << std::endl;
+//    std::cout << "started left rotate key: " << node->key << std::endl;
     AVLNode<T, U>* tmp = node->right;
     node->right = tmp->left;
     tmp->left = node;
@@ -137,7 +138,7 @@ template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::rotate_right(AVLNode<T,U>*& node){
     //TODO
     
-    std::cout << "started right rotate key: " << node->key << std::endl;
+//    std::cout << "started right rotate key: " << node->key << std::endl;
     AVLNode<T, U>* tmp = node->left;
     node->left = tmp->right;
     tmp->right = node;
@@ -157,24 +158,24 @@ void AVLTree<T, U>::makeBalance(AVLNode<T,U>*& node, const T& key){
     int balanceDifference = getBalance(node);
     //right-left
     if (balanceDifference < -1 && key < node->right->key){
-        std::cout  << "case: (right, left)" << std::endl;
+//        std::cout  << "case: (right, left)" << std::endl;
         node->right = rotate_right(node->right);
         node = rotate_left(node);
     }
     //right-right
     else if (balanceDifference < -1 && key > node->right->key){
-        std::cout  << "case: (right, right)" << std::endl;
+//        std::cout  << "case: (right, right)" << std::endl;
         node = rotate_left(node);
     }
     //left-right
     else if (balanceDifference > 1 && key > node->left->key){
-        std::cout  << "case: (left, right)" << std::endl;
+ //       std::cout  << "case: (left, right)" << std::endl;
         node->left = rotate_left(node->left);
         node = rotate_right(node);
     }
     //left-left
     else if (balanceDifference > 1 && key < node->left->key){
-        std::cout  << "case: (left, left)" << std::endl;
+//        std::cout  << "case: (left, left)" << std::endl;
         node = rotate_right(node);
     }
     // std::cout << "finished Balancing" << std::endl;
@@ -186,7 +187,7 @@ AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& v
     if (node == nullptr){
         AVLNode<T,U>* newNode = new AVLNode<T, U>(key, value);
         node = newNode;
-        std::cout << "new Node generated: " << node->key << std::endl;
+//        std::cout << "new Node generated: " << node->key << std::endl;
         return node;
         
     }
@@ -219,9 +220,49 @@ U AVLTree<T,U>::search(AVLNode<T,U>*& node, const T& key) {
     std::cout << "error at searching" << std::endl;
 }
 
+
 template<typename T, typename U>
-void normalBSTRemove(AVLNode<T,U>*& node){
-    return;
+AVLNode<T, U>* getNextBiggerNodeParent(AVLNode<T, U>*& node){
+    AVLNode<T, U>* rightNode = node->right;
+    AVLNode<T, U>* prightNode = node;
+    while (rightNode->left != nullptr){
+        prightNode = rightNode;
+        rightNode = rightNode->left;
+    }
+    return prightNode;
+        
+}
+
+template<typename T, typename U>
+void AVLTree<T, U>::normalBSTRemove(AVLNode<T,U>*& deleteNode){
+    if (deleteNode->left == nullptr){
+        deleteNode = deleteNode->right;
+        delete deleteNode;
+        return;    
+    } 
+    else if (deleteNode->right == nullptr){
+        deleteNode = deleteNode->left;
+        delete deleteNode;
+        return;
+    }
+    else{
+        //min node of right child
+        // The node that is next to deleteNode
+        AVLNode<T, U>* nextBiggerNodeParent = getNextBiggerNodeParent(deleteNode);
+        AVLNode<T, U>* nextBiggerNode = nextBiggerNodeParent->left;
+
+        deleteNode->key = nextBiggerNode->key;
+        deleteNode->value = nextBiggerNode->value;
+
+        if (deleteNode->right == nextBiggerNode){
+            deleteNode->right = nextBiggerNode->right;
+        }
+        else{
+            nextBiggerNodeParent->left = nextBiggerNode->right;
+        }
+
+        delete nextBiggerNode;            
+    }
 }
 
 template<typename T, typename U>
