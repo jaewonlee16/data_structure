@@ -62,6 +62,7 @@ class AVLTree {
         U search(AVLNode<T,U>*& node, const T& key);
         AVLNode<T,U>* remove(AVLNode<T,U>*& node, const T& key);
         void removeall(AVLNode<T,U>*& node);
+        void makeBalance(AVLNode<T,U>*& node, const T& key);
 
 };
 
@@ -149,26 +150,10 @@ AVLNode<T,U>* AVLTree<T,U>::rotate_right(AVLNode<T,U>*& node){
 
 }
 
+
 template<typename T, typename U>
-AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& value) {
-    //TODO
-    if (node == nullptr){
-        AVLNode<T,U>* newNode = new AVLNode<T, U>(key, value);
-        node = newNode;
-        std::cout << "new Node generated: " << node->key << std::endl;
-        return node;
-        
-    }
-    else if(key < node->key){
-        node->left = insert(node->left, key, value);
-    }
-    else{
-        node->right = insert(node->right, key, value);
-    }
-
-    node->height = maxHeight(node->left, node->right) + 1;
-    // std::cout << "finished changing height after new Node generated" << std::endl;
-
+void AVLTree<T, U>::makeBalance(AVLNode<T,U>*& node, const T& key){
+    
     int balanceDifference = getBalance(node);
     //right-left
     if (balanceDifference < -1 && key < node->right->key){
@@ -193,6 +178,29 @@ AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& v
         node = rotate_right(node);
     }
     // std::cout << "finished Balancing" << std::endl;
+}
+
+template<typename T, typename U>
+AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& value) {
+    //TODO
+    if (node == nullptr){
+        AVLNode<T,U>* newNode = new AVLNode<T, U>(key, value);
+        node = newNode;
+        std::cout << "new Node generated: " << node->key << std::endl;
+        return node;
+        
+    }
+    else if(key < node->key){
+        node->left = insert(node->left, key, value);
+    }
+    else{
+        node->right = insert(node->right, key, value);
+    }
+
+    node->height = maxHeight(node->left, node->right) + 1;
+    // std::cout << "finished changing height after new Node generated" << std::endl;
+    makeBalance(node, key);
+    
     return node;
 }
 
@@ -200,12 +208,36 @@ template<typename T, typename U>
 U AVLTree<T,U>::search(AVLNode<T,U>*& node, const T& key) {
     //TODO
     //return NULL if there are no such key, return value if there is
-    return node->value;
+    if (node == nullptr)
+        return "";
+    else if (node->key == key)
+        return node->value;
+    else if(key > node->key ){
+        return search(node->right, key);
+    }else if (key < node->key)
+        return search(node->left, key);
+    std::cout << "error at searching" << std::endl;
+}
+
+template<typename T, typename U>
+void normalBSTRemove(AVLNode<T,U>*& node){
+    return;
 }
 
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::remove(AVLNode<T,U>*& node, const T& key) {
     //TODO
+    if (node->key == key)
+        normalBSTRemove(node);
+    else if (key < node->key)
+        node->left = remove(node->left, key);
+    else if (key > node->key)
+        node->right = remove(node->right, key);
+
+    if (node != nullptr){
+        node->height = maxHeight(node->left, node->right) + 1;
+        makeBalance(node, key);
+    }
     return node;
 }
 

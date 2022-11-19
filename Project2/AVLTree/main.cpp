@@ -48,18 +48,18 @@ int main () {
     cout<<endl;
 
     start_search = clock();
-/*
+
     cout<<"print search"<<endl;
     cout<<"_________________________"<<endl;
     cout<<"search 54155: "<<tree.search(54155)<<endl;
     //print 0 if none
     cout<<"search 12345:"<<tree.search(12345)<<endl;
     cout<<"search 11243:"<<tree.search(11243)<<endl; //removed
-*/
+
     finish_search = clock();
    
     //time for operation ( this case may have 0ms )
-    cout<<endl<<"print time for opration"<<endl;
+    cout<<endl<<"print time for operation"<<endl;
     cout<<"_________________________"<<endl;
     cout<<"time for insert and remove: "<<(double)(finish_insert_remove-start_insert_remove)<<"ms"<<endl;   
     cout<<"time for search: "<<(double)(finish_search-start_search)<<"ms"<<endl;  
