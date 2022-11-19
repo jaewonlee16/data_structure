@@ -286,7 +286,9 @@ template<typename T, typename U>
 void AVLTree<T,U>::removeall(AVLNode<T,U>*& node) {
     //TODO
     //for destructor
-        
-    return;
-    
+    if (node){
+        removeall(node->left);
+        removeall(node->right);
+        delete node;
+    }
 }
