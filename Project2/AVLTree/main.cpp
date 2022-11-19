@@ -30,7 +30,7 @@ int main () {
     tree.insert(32340, "banpodong");
     tree.insert(33450, "dobongdong");
     tree.insert(25234, "samseongdong");    
-    tree.remove(54312);
+    // tree.remove(54312);
     tree.insert(54155, "gurodong");
     tree.insert(51211, "banghwadong");
     
@@ -48,14 +48,14 @@ int main () {
     cout<<endl;
 
     start_search = clock();
-
+/*
     cout<<"print search"<<endl;
     cout<<"_________________________"<<endl;
     cout<<"search 54155: "<<tree.search(54155)<<endl;
     //print 0 if none
     cout<<"search 12345:"<<tree.search(12345)<<endl;
     cout<<"search 11243:"<<tree.search(11243)<<endl; //removed
-
+*/
     finish_search = clock();
    
     //time for operation ( this case may have 0ms )

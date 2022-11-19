@@ -94,31 +94,94 @@ bool AVLTree<T,U>::remove(const T& key) {
     return true;
 }
 
+
+int maxHeight(const AVLNode<T,U>*& node1, const AVLNode<T,U>*& node2){
+    int height1, height2;
+    if (node1 == nullptr)
+        height1 = 0;
+    else
+        height1 = node1->height;
+
+    if (node2 == nullptr)
+        height2 = 0;
+    else
+        height2 = node2->height;
+
+
+    if (height1 > height2)
+        return height1;
+    else
+        return height2;
+}
+
+
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::rotate_left(AVLNode<T,U>*& node){
     //TODO    
+    AVLNode* tmp = node->right;
+    node->right = tmp->left;
+    tmp->left = node;
 
+    // change heights
+    node->height = maxHeight(node->left, node->right) + 1;
+    tmp->height = maxHeight(tmp->left, tmp->right) + 1;
+    return tmp;
 
 }
 
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::rotate_right(AVLNode<T,U>*& node){
     //TODO
+    
+    AVLNode* tmp = node->left;
+    node->left = tmp->right;
+    tmp->right = node;
 
+    // change heights
+    node->height = maxHeight(node->left, node->right) + 1;
+    tmp->height = maxHeight(tmp->left, tmp->right) + 1;
+    return tmp;
 
 }
 
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& value) {
     //TODO
-    
-    //right-left
+    if (node == nullptr){
+        AVLNode<T, U>* newNode = new AVLNode<T, U>;
+        newNode->key = key;
+        newNode->value = value;
+        newNode->height = 1;
+    }
+    else if(key < node->key){
+        node->left = insert(node->left, key, value);
+    }
+    else{
+        node->right = insert(node->right, key, value);
+    }
 
-    //right-right
-    
-    //left-right
-   
+    node->height = maxHeight(node->left, node->right) + 1;
+
+
+    int balanceDifference = getBalance(node);
     //right-left
+    if (balanceDifference < -1 && key < node->right->key){
+        node->right = rotate_right(node->right);
+        node = rotate_left(node);
+    }
+    //right-right
+    else if (balanceDifference < -1 && key > node->right->key)
+        node = rotate_left(node);
+    //left-right
+    else if (balanceDifference > -1 && key > node->left->key){
+        node->left = rotate_left(node->left);
+        node = rotate_right(node);
+    }
+    //right-left
+    else if (balanceDifference > -1 && key < node->left->key)
+        node = rotate_right(node);
+
+    return node;
 }
 
 template<typename T, typename U>
