@@ -70,7 +70,6 @@ class AVLTree {
 template <typename T, typename U>
 int AVLTree<T,U>::getHeight(AVLNode<T,U>*& node){
     if(!node) return 0;
-    std::cout << "key: " << node->key << "    height: " << node->height << std::endl;
     return node->height;
 }
 
@@ -158,7 +157,6 @@ void AVLTree<T, U>::makeBalance(AVLNode<T,U>*& node, const T& key){
     
     int balanceDifference = getBalance(node);
     //right-left
-    std::cout << "balanceDifference:  " << balanceDifference << std::endl;
     if (balanceDifference < -1 && key < node->right->key){
 //        std::cout  << "case: (right, left)" << std::endl;
         node->right = rotate_right(node->right);
@@ -219,7 +217,6 @@ U AVLTree<T,U>::search(AVLNode<T,U>*& node, const T& key) {
         return search(node->right, key);
     }else if (key < node->key)
         return search(node->left, key);
-    std::cout << "error at searching" << std::endl;
 }
 
 
