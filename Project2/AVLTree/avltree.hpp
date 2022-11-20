@@ -63,13 +63,14 @@ class AVLTree {
         AVLNode<T,U>* remove(AVLNode<T,U>*& node, const T& key);
         void removeall(AVLNode<T,U>*& node);
         void makeBalance(AVLNode<T,U>*& node, const T& key);
-        void normalBSTRemove(AVLNode<T,U>*& deleteNode);
+        AVLNode<T,U>* normalBSTRemove(AVLNode<T,U>*& deleteNode);
 
 };
 
 template <typename T, typename U>
 int AVLTree<T,U>::getHeight(AVLNode<T,U>*& node){
     if(!node) return 0;
+    std::cout << "key: " << node->key << "    height: " << node->height << std::endl;
     return node->height;
 }
 
@@ -157,6 +158,7 @@ void AVLTree<T, U>::makeBalance(AVLNode<T,U>*& node, const T& key){
     
     int balanceDifference = getBalance(node);
     //right-left
+    std::cout << "balanceDifference:  " << balanceDifference << std::endl;
     if (balanceDifference < -1 && key < node->right->key){
 //        std::cout  << "case: (right, left)" << std::endl;
         node->right = rotate_right(node->right);
@@ -222,7 +224,7 @@ U AVLTree<T,U>::search(AVLNode<T,U>*& node, const T& key) {
 
 
 template<typename T, typename U>
-AVLNode<T, U>* getNextBiggerNodeParent(AVLNode<T, U>*& node){
+AVLNode<T, U>* getNextBiggerNodeParent(AVLNode<T, U>* node){
     AVLNode<T, U>* rightNode = node->right;
     AVLNode<T, U>* prightNode = node;
     while (rightNode->left != nullptr){
@@ -234,22 +236,30 @@ AVLNode<T, U>* getNextBiggerNodeParent(AVLNode<T, U>*& node){
 }
 
 template<typename T, typename U>
-void AVLTree<T, U>::normalBSTRemove(AVLNode<T,U>*& deleteNode){
+AVLNode<T, U>* getNextBiggerNode(AVLNode<T, U>* node){
+    AVLNode<T, U>* rightNode = node->right;
+    while (rightNode->left != nullptr){
+        rightNode = rightNode->left;
+    }
+    return rightNode;
+        
+}
+
+template<typename T, typename U>
+AVLNode<T,U>* AVLTree<T, U>::normalBSTRemove(AVLNode<T,U>*& deleteNode){
+    AVLNode<T, U>* tmpNode = deleteNode;
+    
     if (deleteNode->left == nullptr){
-        deleteNode = deleteNode->right;
-        delete deleteNode;
-        return;    
+        deleteNode = deleteNode->right; 
     } 
     else if (deleteNode->right == nullptr){
         deleteNode = deleteNode->left;
-        delete deleteNode;
-        return;
     }
     else{
         //min node of right child
         // The node that is next to deleteNode
         AVLNode<T, U>* nextBiggerNodeParent = getNextBiggerNodeParent(deleteNode);
-        AVLNode<T, U>* nextBiggerNode = nextBiggerNodeParent->left;
+        AVLNode<T, U>* nextBiggerNode = getNextBiggerNode(deleteNode);
 
         deleteNode->key = nextBiggerNode->key;
         deleteNode->value = nextBiggerNode->value;
@@ -260,16 +270,18 @@ void AVLTree<T, U>::normalBSTRemove(AVLNode<T,U>*& deleteNode){
         else{
             nextBiggerNodeParent->left = nextBiggerNode->right;
         }
-
-        delete nextBiggerNode;            
+        tmpNode = nextBiggerNode;
     }
+    delete tmpNode;
+    return deleteNode;
 }
 
 template<typename T, typename U>
 AVLNode<T,U>* AVLTree<T,U>::remove(AVLNode<T,U>*& node, const T& key) {
     //TODO
-    if (node->key == key)
+    if (node->key == key){
         normalBSTRemove(node);
+    }
     else if (key < node->key)
         node->left = remove(node->left, key);
     else if (key > node->key)

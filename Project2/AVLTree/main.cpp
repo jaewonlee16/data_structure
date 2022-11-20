@@ -35,7 +35,16 @@ int main () {
     tree.insert(54155, "gurodong");
     tree.insert(51211, "banghwadong");
     tree.remove(11243);
-    
+    tree.remove(16545);
+
+    tree.remove(66443);
+    tree.remove(55443);
+    tree.remove(32340);
+    tree.remove(33450);
+    tree.remove(25234);
+    tree.remove(54155);
+
+ 
     finish_insert_remove = clock();
 
     cout<<"print inorder"<<endl;
