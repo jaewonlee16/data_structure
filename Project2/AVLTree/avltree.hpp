@@ -191,10 +191,14 @@ AVLNode<T,U>* AVLTree<T,U>::insert(AVLNode<T,U>*& node, const T& key, const U& v
         return node;
         
     }
+    else if (key == node->key){
+        node->value = value;
+        return node;
+    }
     else if(key < node->key){
         node->left = insert(node->left, key, value);
     }
-    else{
+    else if (key > node->key) {
         node->right = insert(node->right, key, value);
     }
 
