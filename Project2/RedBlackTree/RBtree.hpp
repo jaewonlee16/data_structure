@@ -84,13 +84,53 @@ bool RBTree<T,U>::remove(const T& key) {
 template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::rotate_left(RBNode<T,U>*& node){
     //TODO    
+    RBNode<T, U>* tmp = node->right;
 
+    //first
+    node->right = tmp->left;
+    if (node->right != nullptr)
+        node->right->parent = node;        
+
+    // second
+    tmp->parent = node->parent;
+    if (!tmp->parent){
+        // when input node is root node
+    } else if (node->parent->left == tmp)
+        tmp->parent->left = tmp;
+    else if (node->parent->right == tmp)
+        tmp->parent->right = tmp;        
+
+    // third
+    tmp->left = node;
+    node->parent = tmp;
+
+    return tmp;
 }
 
 template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::rotate_right(RBNode<T,U>*& node){
     //TODO
+    AVLNode<T, U>* tmp = node->left;
 
+    //first
+    node->left = tmp->right;
+    if (node->left != nullptr)
+        node->left->parent = node;        
+
+    // second
+    tmp->parent = node->parent;
+    if (!tmp->parent){
+        // when input node is root node
+    } else if (node->parent->left == tmp)
+        tmp->parent->left = tmp;
+    else if (node->parent->right == tmp)
+        tmp->parent->right = tmp;        
+
+    // third
+    tmp->right = node;
+    node->left = tmp;
+
+    return tmp;
 }
 
 template<typename T, typename U>
@@ -117,6 +157,6 @@ void RBTree<T,U>::removeall(RBNode<T,U>*& node) {
     //TODO
     //for destructor
         
-    }
+    
     
 }
