@@ -128,7 +128,7 @@ RBNode<T,U>* RBTree<T,U>::rotate_right(RBNode<T,U>*& node){
 
     // third
     tmp->right = node;
-    node->left = tmp;
+    node->parent = tmp;
 
     return tmp;
 }
