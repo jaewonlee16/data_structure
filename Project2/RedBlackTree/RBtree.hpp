@@ -3,6 +3,9 @@
 #include <optional>
 #include <unistd.h>
 
+#define RED 1
+#define BLACK 0
+
 template <typename T, typename U>
 class RBNode{
     
@@ -62,6 +65,7 @@ class RBTree {
         RBNode<T,U>* remove(RBNode<T,U>*& node, const T& key);
         void removeall(RBNode<T,U>*& node);
 
+        void normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
 };
 
 template<typename T, typename U>
@@ -134,9 +138,39 @@ RBNode<T,U>* RBTree<T,U>::rotate_right(RBNode<T,U>*& node){
 }
 
 template<typename T, typename U>
+void RBTree<T, U>::normalBSTInsertPosition(RBNode<T, U>*& node, const T& key){
+    while (1){
+        if (node == nullptr)
+            break;
+        else if (key == node->key)
+            return;
+        else if (key > node->key)
+            node = node->right;
+        else if (key < node->key)
+            node = node->left;
+    }
+}
+
+
+template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& value) {
     //TODO
+    RBNode<T, U>* insertNode = node;
+    normalBSTInsertPosition(insertNode);
 
+    if (node != nullptr){   // when key is already detected
+        node->value = value;
+        return node;
+    }
+    else{
+        // new node
+        RBNode<T, U>* newNode = new RBNode<T, U>(key, value);
+        newNode->color = RED;
+        newNode->parent = insertNode // error ....  add parent to newNode and add left or right to parent of newNode
+        insertBalancing(insertNode); // did't define the function yet.  MUST BE added
+    }
+
+    return node;
 }
 
 template<typename T, typename U>
