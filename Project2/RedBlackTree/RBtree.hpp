@@ -65,6 +65,9 @@ class RBTree {
         RBNode<T,U>* remove(RBNode<T,U>*& node, const T& key);
         void removeall(RBNode<T,U>*& node);
 
+        bool isParentRed(const RBNode<T,U>*& node);
+        bool isLeftChild(const RBNode<T,U>*& node);
+        bool isRightChild(const RBNode<T,U>*& node);
         void normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
 };
 
@@ -86,6 +89,27 @@ bool RBTree<T,U>::remove(const T& key) {
 }
 
 template<typename T, typename U>
+bool RBTree<T, U>::isParentRed(const RBNode<T,U>*& node){
+    return node->parent == RED;
+}
+
+template<typename T, typename U>
+bool RBTree<T,U>::isLeftChild(const RBNode<T,U>*& node){
+    RBNode<T, U>* tmp = node;
+    if (tmp->parent == nullptr)
+        return false;
+    return tmp->parent->left == tmp;       
+}
+
+template<typename T, typename U>
+bool RBTree<T,U>::isRightChild(const RBNode<T,U>*& node){
+    RBNode<T, U>* tmp = node;
+    if (tmp->parent == nullptr)
+        return false;
+    return tmp->parent->Right == tmp;       
+}
+
+template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::rotate_left(RBNode<T,U>*& node){
     //TODO    
     RBNode<T, U>* tmp = node->right;
@@ -99,9 +123,9 @@ RBNode<T,U>* RBTree<T,U>::rotate_left(RBNode<T,U>*& node){
     tmp->parent = node->parent;
     if (!tmp->parent){
         // when input node is root node
-    } else if (node->parent->left == tmp)
+    } else if ( isLeftChild(tmp))
         tmp->parent->left = tmp;
-    else if (node->parent->right == tmp)
+    else if ( isRightChild(tmp))
         tmp->parent->right = tmp;        
 
     // third
@@ -125,9 +149,9 @@ RBNode<T,U>* RBTree<T,U>::rotate_right(RBNode<T,U>*& node){
     tmp->parent = node->parent;
     if (!tmp->parent){
         // when input node is root node
-    } else if (node->parent->left == tmp)
+    } else if ( isLeftChild(tmp))
         tmp->parent->left = tmp;
-    else if (node->parent->right == tmp)
+    else if ( isRightChild(tmp))
         tmp->parent->right = tmp;        
 
     // third
@@ -158,17 +182,33 @@ RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& valu
     RBNode<T, U>* insertNode = node;
     normalBSTInsertPosition(insertNode);
 
+    // case 0
     if (node != nullptr){   // when key is already detected
         node->value = value;
         return node;
     }
-    else{
-        // new node
-        RBNode<T, U>* newNode = new RBNode<T, U>(key, value);
-        newNode->color = RED;
-        newNode->parent = insertNode // error ....  add parent to newNode and add left or right to parent of newNode
-        insertBalancing(insertNode); // did't define the function yet.  MUST BE added
+
+    // new node
+    RBNode<T, U>* newNode = new RBNode<T, U>(key, value);
+    newNode->color = RED;
+    newNode->parent = insertNode->parent;
+
+    // case 1
+    if (insertNode->parent == nullptr){ // when root
+        newNode->color = BLACK;
+        return node;
     }
+
+    if (isLeftChild(newNode))
+        newNode->parent->left = newNode;
+    else if (isRightChild(newNode))
+        newNode->parent->right = newNode;
+
+    //case 2
+    if (!isParentRed(newNode))
+        return node;
+    else
+        insertBalancing(insertNode); // did't define the function yet.  MUST BE added
 
     return node;
 }
