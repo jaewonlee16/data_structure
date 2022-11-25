@@ -65,9 +65,6 @@ class RBTree {
         RBNode<T,U>* remove(RBNode<T,U>*& node, const T& key);
         void removeall(RBNode<T,U>*& node);
 
-        bool isParentRed(const RBNode<T,U>*& node);
-        bool isLeftChild(const RBNode<T,U>*& node);
-        bool isRightChild(const RBNode<T,U>*& node);
         void normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
 };
 
@@ -89,12 +86,12 @@ bool RBTree<T,U>::remove(const T& key) {
 }
 
 template<typename T, typename U>
-bool RBTree<T, U>::isParentRed(const RBNode<T,U>*& node){
+bool isParentRed(const RBNode<T,U>*& node){
     return node->parent == RED;
 }
 
 template<typename T, typename U>
-bool RBTree<T,U>::isLeftChild(const RBNode<T,U>*& node){
+bool isLeftChild(const RBNode<T,U>*& node){
     RBNode<T, U>* tmp = node;
     if (tmp->parent == nullptr)
         return false;
@@ -102,11 +99,16 @@ bool RBTree<T,U>::isLeftChild(const RBNode<T,U>*& node){
 }
 
 template<typename T, typename U>
-bool RBTree<T,U>::isRightChild(const RBNode<T,U>*& node){
+bool isRightChild(const RBNode<T,U>*& node){
     RBNode<T, U>* tmp = node;
     if (tmp->parent == nullptr)
         return false;
     return tmp->parent->Right == tmp;       
+}
+
+template<typename T, typename U>
+bool isRoot(const RBNode<T, U>*& node){
+    return node->parent == nullptr;
 }
 
 template<typename T, typename U>
@@ -175,6 +177,29 @@ void RBTree<T, U>::normalBSTInsertPosition(RBNode<T, U>*& node, const T& key){
     }
 }
 
+template<typename T, typename U>
+void insertBalancing(RBNode<T, U>*& node){
+    if (isRoot(node->parent) == nullptr)
+        return;
+    else{
+        while (!isRoot(node) && isParentRed(node)){
+                        
+            RBNode<T, U>* grandparent = node->parent->parent;
+            RBNode<T, U>* uncle = isLeftChild(node->parent) ? grandparent->right : grandparent->left;
+            // case 3-1: if P id Red and U is Red
+            if (isParentRed(node) && uncle->color == RED){
+                node->parent->color = BLACK;
+                uncle->color = BLACK;
+                grandparent->color = isRoot(grandparent) ? BLACK : RED;
+            }        
+            else{
+                // case 3-2-1
+                
+            }
+        }
+        
+    }
+}
 
 template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& value) {
@@ -194,7 +219,7 @@ RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& valu
     newNode->parent = insertNode->parent;
 
     // case 1
-    if (insertNode->parent == nullptr){ // when root
+    if (isRoot(insertNode)){ // when root
         newNode->color = BLACK;
         return node;
     }
