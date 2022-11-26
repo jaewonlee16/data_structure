@@ -65,7 +65,8 @@ class RBTree {
         RBNode<T,U>* remove(RBNode<T,U>*& node, const T& key);
         void removeall(RBNode<T,U>*& node);
 
-        void normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
+        RBNode<T, U>* normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
+        void insertBalancing(RBNode<T, U>*& node);
 };
 
 template<typename T, typename U>
@@ -86,12 +87,12 @@ bool RBTree<T,U>::remove(const T& key) {
 }
 
 template<typename T, typename U>
-bool isParentRed(const RBNode<T,U>*& node){
-    return node->parent == RED;
+bool isParentRed(RBNode<T,U>* node){
+    return node->parent->color == RED;
 }
 
 template<typename T, typename U>
-bool isLeftChild(const RBNode<T,U>*& node){
+bool isLeftChild(RBNode<T,U>* node){
     RBNode<T, U>* tmp = node;
     if (tmp->parent == nullptr)
         return false;
@@ -99,15 +100,17 @@ bool isLeftChild(const RBNode<T,U>*& node){
 }
 
 template<typename T, typename U>
-bool isRightChild(const RBNode<T,U>*& node){
+bool isRightChild(RBNode<T,U>* node){
     RBNode<T, U>* tmp = node;
     if (tmp->parent == nullptr)
         return false;
-    return tmp->parent->Right == tmp;       
+    return tmp->parent->right == tmp;       
 }
 
 template<typename T, typename U>
-bool isRoot(const RBNode<T, U>*& node){
+bool isRoot(const RBNode<T, U>* node){
+    if (node == nullptr)
+        return false;
     return node->parent == nullptr;
 }
 
@@ -140,7 +143,7 @@ RBNode<T,U>* RBTree<T,U>::rotate_left(RBNode<T,U>*& node){
 template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::rotate_right(RBNode<T,U>*& node){
     //TODO
-    AVLNode<T, U>* tmp = node->left;
+    RBNode<T, U>* tmp = node->left;
 
     //first
     node->left = tmp->right;
@@ -164,40 +167,63 @@ RBNode<T,U>* RBTree<T,U>::rotate_right(RBNode<T,U>*& node){
 }
 
 template<typename T, typename U>
-void RBTree<T, U>::normalBSTInsertPosition(RBNode<T, U>*& node, const T& key){
+RBNode<T, U>* RBTree<T, U>::normalBSTInsertPosition(RBNode<T, U>*& node, const T& key){
+    RBNode<T, U>* y = node;
     while (1){
+        y = node;
         if (node == nullptr)
             break;
         else if (key == node->key)
-            return;
+            return y;
         else if (key > node->key)
             node = node->right;
         else if (key < node->key)
             node = node->left;
     }
+    return y;
 }
 
 template<typename T, typename U>
-void insertBalancing(RBNode<T, U>*& node){
-    if (isRoot(node->parent) == nullptr)
+void RBTree<T, U>::insertBalancing(RBNode<T, U>*& node){
+    if (isRoot(node->parent))
         return;
     else{
         while (!isRoot(node) && isParentRed(node)){
                         
             RBNode<T, U>* grandparent = node->parent->parent;
             RBNode<T, U>* uncle = isLeftChild(node->parent) ? grandparent->right : grandparent->left;
+            int uncleColor = uncle ? uncle->color : BLACK;
+
+
             // case 3-1: if P id Red and U is Red
-            if (isParentRed(node) && uncle->color == RED){
+            if (isParentRed(node) && uncleColor == RED){
                 node->parent->color = BLACK;
                 uncle->color = BLACK;
                 grandparent->color = isRoot(grandparent) ? BLACK : RED;
+                node = grandparent;
             }        
             else{
+                // case 3-2-2
+                bool isParentLeftChild = isLeftChild(node->parent);
+                if (isParentLeftChild ? isRightChild(node) : isLeftChild(node)){
+                    node = node->parent;
+                    node = isParentLeftChild ? rotate_left(node) : rotate_right(node);
+                }
                 // case 3-2-1
-                
+                node->parent->color = BLACK;
+                grandparent->color = RED;
+                node = isParentLeftChild ? rotate_right(grandparent) : rotate_left(grandparent);
+                break;
+
             }
         }
         
+    }
+    if (node){
+        while(node->parent != nullptr){
+            node = node->parent;
+        }
+        node->color = BLACK;
     }
 }
 
@@ -205,7 +231,7 @@ template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& value) {
     //TODO
     RBNode<T, U>* insertNode = node;
-    normalBSTInsertPosition(insertNode);
+    RBNode<T, U>* y = normalBSTInsertPosition(insertNode, key);
 
     // case 0
     if (node != nullptr){   // when key is already detected
@@ -216,10 +242,11 @@ RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& valu
     // new node
     RBNode<T, U>* newNode = new RBNode<T, U>(key, value);
     newNode->color = RED;
-    newNode->parent = insertNode->parent;
+    newNode->parent = y;
 
     // case 1
-    if (isRoot(insertNode)){ // when root
+    if (isRoot(newNode)) { // when root 
+        node = newNode;
         newNode->color = BLACK;
         return node;
     }
