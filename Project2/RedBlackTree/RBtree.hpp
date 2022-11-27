@@ -67,6 +67,7 @@ class RBTree {
 
         RBNode<T, U>* normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
         RBNode<T, U>* insertBalancing(RBNode<T, U>*& node);
+        RBNode<T,U>* searchNode(RBNode<T,U>* node, const T& key);
 };
 
 template<typename T, typename U>
@@ -284,10 +285,34 @@ U RBTree<T,U>::search(RBNode<T,U>*& node, const T& key) {
 }
 
 template<typename T, typename U>
+RBNode<T,U>* RBTree<T,U>::searchNode(RBNode<T,U>* node, const T& key){
+    RBNode<T, U>* presentNode = node;
+    while (presentNode){
+        if (presentNode->key == key)
+            return presentNode;
+        else if (key < presentNode->key)
+            presentNode = presentNode->left;
+        else if (key > presentNode->key)
+            presentNode = presentNode->right;            
+    }
+    return presentNode;
+}
+
+template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
 
     //TODO
+    RBNode<T, U>* nodeToBeDeleted = searchNode(node, key);
 
+    if (!nodeToBeDeleted){
+        return nodeToBeDeleted;
+    }
+    RBNode<T, U>* x, y;
+    int originalColor = nodeToBeDeleted->color;
+    if (nodeToBeDeleted->left == nullptr && nodeToBeDeleted->right == nullptr){
+        x = nodeToBeDeleted->right;
+        // as x is nullptr need to find way to impement in deleteFix(). x->parent leads to error so no way to find sibling(w)
+    }
 }
 
 template<typename T, typename U>
