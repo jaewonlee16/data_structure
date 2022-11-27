@@ -66,7 +66,7 @@ class RBTree {
         void removeall(RBNode<T,U>*& node);
 
         RBNode<T, U>* normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
-        void insertBalancing(RBNode<T, U>*& node);
+        RBNode<T, U>* insertBalancing(RBNode<T, U>*& node);
 };
 
 template<typename T, typename U>
@@ -128,9 +128,9 @@ RBNode<T,U>* RBTree<T,U>::rotate_left(RBNode<T,U>*& node){
     tmp->parent = node->parent;
     if (!tmp->parent){
         // when input node is root node
-    } else if ( isLeftChild(tmp))
+    } else if ( isLeftChild(node))
         tmp->parent->left = tmp;
-    else if ( isRightChild(tmp))
+    else if ( isRightChild(node))
         tmp->parent->right = tmp;        
 
     // third
@@ -154,9 +154,9 @@ RBNode<T,U>* RBTree<T,U>::rotate_right(RBNode<T,U>*& node){
     tmp->parent = node->parent;
     if (!tmp->parent){
         // when input node is root node
-    } else if ( isLeftChild(tmp))
+    } else if ( isLeftChild(node))
         tmp->parent->left = tmp;
-    else if ( isRightChild(tmp))
+    else if ( isRightChild(node))
         tmp->parent->right = tmp;        
 
     // third
@@ -170,10 +170,10 @@ template<typename T, typename U>
 RBNode<T, U>* RBTree<T, U>::normalBSTInsertPosition(RBNode<T, U>*& node, const T& key){
     RBNode<T, U>* y = node;
     while (1){
-        y = node;
         if (node == nullptr)
             break;
-        else if (key == node->key)
+        y = node;
+        if (key == node->key)
             return y;
         else if (key > node->key)
             node = node->right;
@@ -184,9 +184,9 @@ RBNode<T, U>* RBTree<T, U>::normalBSTInsertPosition(RBNode<T, U>*& node, const T
 }
 
 template<typename T, typename U>
-void RBTree<T, U>::insertBalancing(RBNode<T, U>*& node){
+RBNode<T, U>* RBTree<T, U>::insertBalancing(RBNode<T, U>*& node){
     if (isRoot(node->parent))
-        return;
+        return node;
     else{
         while (!isRoot(node) && isParentRed(node)){
                         
@@ -210,7 +210,7 @@ void RBTree<T, U>::insertBalancing(RBNode<T, U>*& node){
                     node = isParentLeftChild ? rotate_left(node) : rotate_right(node);
                 }
                 // case 3-2-1
-                node->parent->color = BLACK;
+                node->color = BLACK;
                 grandparent->color = RED;
                 node = isParentLeftChild ? rotate_right(grandparent) : rotate_left(grandparent);
                 break;
@@ -225,6 +225,7 @@ void RBTree<T, U>::insertBalancing(RBNode<T, U>*& node){
         }
         node->color = BLACK;
     }
+    return node;
 }
 
 template<typename T, typename U>
@@ -234,8 +235,8 @@ RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& valu
     RBNode<T, U>* y = normalBSTInsertPosition(insertNode, key);
 
     // case 0
-    if (node != nullptr){   // when key is already detected
-        node->value = value;
+    if (insertNode != nullptr){   // when key is already detected
+        insertNode->value = value;
         return node;
     }
 
@@ -251,16 +252,16 @@ RBNode<T,U>* RBTree<T,U>::insert(RBNode<T,U>*& node, const T& key, const U& valu
         return node;
     }
 
-    if (isLeftChild(newNode))
+    if (newNode->key < newNode->parent->key)
         newNode->parent->left = newNode;
-    else if (isRightChild(newNode))
+    else if (newNode->key > newNode->parent->key)
         newNode->parent->right = newNode;
 
     //case 2
     if (!isParentRed(newNode))
         return node;
     else
-        insertBalancing(insertNode); // did't define the function yet.  MUST BE added
+        node = insertBalancing(newNode); 
 
     return node;
 }
