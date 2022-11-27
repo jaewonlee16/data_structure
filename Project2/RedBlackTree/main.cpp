@@ -5,7 +5,7 @@
 #include <time.h>
 #include <string>
 
-#include "RBtree.h"
+#include "RBtree.hpp"
 #include <iostream>
 
 using namespace std;
@@ -30,11 +30,11 @@ int main () {
     tree.insert(32340, "banpodong");
     tree.insert(33450, "dobongdong");
     tree.insert(25234, "samseongdong");    
-    tree.remove(54312);
+//    tree.remove(54312);
     tree.insert(54155, "gurodong");
     tree.insert(51211, "banghwadong");
     
-    tree.remove(11243);
+ //   tree.remove(11243);
     
     finish_insert_remove = clock();
 
@@ -51,10 +51,10 @@ int main () {
 
     cout<<"print search"<<endl;
     cout<<"_________________________"<<endl;
-    cout<<"search 54155: "<<tree.search(54155)<<endl;
+//    cout<<"search 54155: "<<tree.search(54155)<<endl;
     //print 0 if none
-    cout<<"search 12345:"<<tree.search(12345)<<endl;
-    cout<<"search 11243:"<<tree.search(11243)<<endl; //removed
+//    cout<<"search 12345:"<<tree.search(12345)<<endl;
+//    cout<<"search 11243:"<<tree.search(11243)<<endl; //removed
 
     finish_search = clock();
    
