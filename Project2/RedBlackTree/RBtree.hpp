@@ -270,6 +270,17 @@ template<typename T, typename U>
 U RBTree<T,U>::search(RBNode<T,U>*& node, const T& key) {
     //TODO
     //return NULL if there are no such key, return value if there is
+    RBNode<T, U>* presentNode = node;
+    U result;
+    while (presentNode){
+        if (presentNode->key == key)
+            return presentNode->value;
+        else if (key < presentNode->key)
+            presentNode = presentNode->left;
+        else if (key > presentNode->key)
+            presentNode = presentNode->right;
+    }
+    return result;
 }
 
 template<typename T, typename U>
