@@ -68,6 +68,7 @@ class RBTree {
         RBNode<T, U>* normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
         RBNode<T, U>* insertBalancing(RBNode<T, U>*& node);
         RBNode<T,U>* searchNode(RBNode<T,U>* node, const T& key);
+        RBNode<T,U>* minmum_node(RBNode<T,U>* node, const T& key);
 };
 
 template<typename T, typename U>
@@ -314,6 +315,23 @@ void transplant(RBNode<T, U>*& node1, RBNode<T, U>*& node2){
 }
 
 template<typename T, typename U>
+RBNode<T,U>* RBTree<T,U>::minmum_node(RBNode<T,U>* node, const T& key){
+    RBNode<T, U>* result = node;
+    while (result->left != nullptr){
+        result = result->left;
+    }
+    return result;
+}
+
+
+template<typename T, typename U>
+void deleteBalance(RBNode<T, U>*& node){
+    if (node->color == 999){
+        //  to do
+    }
+}
+
+template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
 
     //TODO
@@ -341,18 +359,32 @@ RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
         y = minimum_node(nodeToBeDeleted->right);
         originalColor = y->color;
         x = y->right;
-        if (x == nullptr){
-            // do something
-            //exception when balancing
+       
+        if (y->parent == nodeToBeDeleted){
+            if (x == nullptr){
+                x = y;
+                x->color = 999;
+            }
         }
-        
-        if (nodeToBeDeleted != y->parent){
+        else{
+            if (x == nullptr){
+                x = y->parent;
+                x->color = 999;
+            }
             transplant(y, y->right);
-            y->right = 
+            y->right = nodeToBeDeleted->right;
+            y->right->parent = y;
         }
+        transplant(nodeToBeDeleted, y);
+        y->left = nodeToBeDeleted->left;
+        y->left->parent = y;
+        y->color = nodeToBeDeleted->color;
+
     }
-    
-    
+    delete nodeToBeDeleted;
+    if (originalColor == BLACK)
+        deleteBalance(x);
+
     while (node->parent != nullptr){
         node = node->parent;
     }
