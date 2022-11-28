@@ -69,6 +69,7 @@ class RBTree {
         RBNode<T, U>* insertBalancing(RBNode<T, U>*& node);
         RBNode<T,U>* searchNode(RBNode<T,U>* node, const T& key);
         RBNode<T,U>* minmum_node(RBNode<T,U>* node, const T& key);
+        void deleteBalance(RBNode<T, U>*& node);
 };
 
 template<typename T, typename U>
@@ -323,9 +324,47 @@ RBNode<T,U>* RBTree<T,U>::minmum_node(RBNode<T,U>* node, const T& key){
     return result;
 }
 
+template<typename T, typename U>
+bool isBlack(RBNode<T, U>* node){
+    if (node == nullptr)
+        return true;
+    return node->color == BLACK;
+}
 
 template<typename T, typename U>
-void deleteBalance(RBNode<T, U>*& node){
+void RBTree<T, U>::deleteBalance(RBNode<T, U>*& node){
+    RBNode<T, U>* w, pNode;
+    while(1){
+        if (node->color >= 90){
+            pNode = node;
+            node = node->left ? node->left : node->right;
+        }
+        else if (node->parent == nullptr || node->color == RED)
+            break;
+        
+        if (node == pNode->left){
+            w = pNode->right;
+
+            // case 1
+            if (w != nullptr && w->color == RED){
+                w->color = BLACK;
+                pNode->color = RED;
+                w = rotate_left(pNode);        
+                pNode = w->left;
+                w = pNode->right;
+            }
+            // case 2
+            if (isBlack(w->left) && isBlack(w->right)){
+                w->color = RED;
+                node = pNode;
+                node->color = node->color % 10;
+            }
+            else {
+                //case 3
+                
+            }
+        }
+    }
     if (node->color == 999){
         //  to do
     }
@@ -345,7 +384,7 @@ RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
     if (nodeToBeDeleted->left == nullptr && nodeToBeDeleted->right == nullptr){
         x = nodeToBeDeleted->parent;
         // as x is nullptr need to find way to impement in deleteFix(). x->parent leads to error so no way to find sibling(w)
-        x->color = 999; // exception that need to be added in deleteFix() ---------------------------------------------------------
+        x->color = 90 + x->color; // exception that need to be added in deleteFix() ---------------------------------------------------------
     }
     else if (nodeToBeDeleted->left == nullptr){
         x = nodeToBeDeleted->right;
@@ -363,13 +402,13 @@ RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
         if (y->parent == nodeToBeDeleted){
             if (x == nullptr){
                 x = y;
-                x->color = 999;
+                x->color = 90 + x->color;
             }
         }
         else{
             if (x == nullptr){
                 x = y->parent;
-                x->color = 999;
+                x->color = 90 + x->color;
             }
             transplant(y, y->right);
             y->right = nodeToBeDeleted->right;
