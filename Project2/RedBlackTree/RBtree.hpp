@@ -298,6 +298,21 @@ RBNode<T,U>* RBTree<T,U>::searchNode(RBNode<T,U>* node, const T& key){
     return presentNode;
 }
 
+
+template<typename T, typename U>
+void transplant(RBNode<T, U>*& node1, RBNode<T, U>*& node2){
+    if (node1 == nullptr || node2 == nullptr)
+        return;
+    else if (node1->parent == nulllptr)
+        // when root
+    else if (isLeftChild(node1))
+        node1->parent->left = node2;
+    else if (isRightChild(node1))
+        node1->parent->right = node2;
+    
+    node2->parent = node1->parent;
+}
+
 template<typename T, typename U>
 RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
 
@@ -310,9 +325,38 @@ RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
     RBNode<T, U>* x, y;
     int originalColor = nodeToBeDeleted->color;
     if (nodeToBeDeleted->left == nullptr && nodeToBeDeleted->right == nullptr){
-        x = nodeToBeDeleted->right;
+        x = nodeToBeDeleted->parent;
         // as x is nullptr need to find way to impement in deleteFix(). x->parent leads to error so no way to find sibling(w)
+        x->color = 999; // exception that need to be added in deleteFix() ---------------------------------------------------------
     }
+    else if (nodeToBeDeleted->left == nullptr){
+        x = nodeToBeDeleted->right;
+        transplant(nodeToBeDeleted, x);
+    }
+    else if (nodeToBeDeleted->right == nullptr){
+        x = nodeToBeDeleted->left;
+        transplant(nodeToBeDeleted, x);
+    }
+    else{
+        y = minimum_node(nodeToBeDeleted->right);
+        originalColor = y->color;
+        x = y->right;
+        if (x == nullptr){
+            // do something
+            //exception when balancing
+        }
+        
+        if (nodeToBeDeleted != y->parent){
+            transplant(y, y->right);
+            y->right = 
+        }
+    }
+    
+    
+    while (node->parent != nullptr){
+        node = node->parent;
+    }
+    return node;
 }
 
 template<typename T, typename U>
