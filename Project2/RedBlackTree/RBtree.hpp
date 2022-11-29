@@ -370,7 +370,7 @@ RBNode<T, U>* RBTree<T, U>::deleteBalance(RBNode<T, U>*& node){
                 pNode->color = BLACK;
                 if (w->right != nullptr)
                     w->right->color = BLACK;
-                pNode = rotate_left(pNode);
+                w = rotate_left(pNode);
                 node = pNode;
                 while (node->parent != nullptr){
                     node->color = node->color % 10;
@@ -408,7 +408,7 @@ RBNode<T, U>* RBTree<T, U>::deleteBalance(RBNode<T, U>*& node){
                 pNode->color = BLACK;
                 if (w->left != nullptr)
                     w->left->color = BLACK;
-                pNode = rotate_right(pNode);
+                w = rotate_right(pNode);
                 node = pNode;
                 while (node->parent != nullptr){
                     node->color = node->color % 10;
