@@ -68,8 +68,8 @@ class RBTree {
         RBNode<T, U>* normalBSTInsertPosition(RBNode<T, U>*& node ,const T& key);
         RBNode<T, U>* insertBalancing(RBNode<T, U>*& node);
         RBNode<T,U>* searchNode(RBNode<T,U>* node, const T& key);
-        RBNode<T,U>* minmum_node(RBNode<T,U>* node, const T& key);
-        void deleteBalance(RBNode<T, U>*& node);
+        RBNode<T,U>* minimum_node(RBNode<T,U>* node);
+        RBNode<T, U>* deleteBalance(RBNode<T, U>*& node);
 };
 
 template<typename T, typename U>
@@ -303,20 +303,18 @@ RBNode<T,U>* RBTree<T,U>::searchNode(RBNode<T,U>* node, const T& key){
 
 template<typename T, typename U>
 void transplant(RBNode<T, U>*& node1, RBNode<T, U>*& node2){
-    if (node1 == nullptr || node2 == nullptr)
+    if (node1 == nullptr)
         return;
-    else if (node1->parent == nulllptr)
-        // when root
     else if (isLeftChild(node1))
         node1->parent->left = node2;
     else if (isRightChild(node1))
         node1->parent->right = node2;
-    
-    node2->parent = node1->parent;
+    if (node2 != nullptr)
+        node2->parent = node1->parent;
 }
 
 template<typename T, typename U>
-RBNode<T,U>* RBTree<T,U>::minmum_node(RBNode<T,U>* node, const T& key){
+RBNode<T,U>* RBTree<T,U>::minimum_node(RBNode<T,U>* node){
     RBNode<T, U>* result = node;
     while (result->left != nullptr){
         result = result->left;
@@ -332,12 +330,12 @@ bool isBlack(RBNode<T, U>* node){
 }
 
 template<typename T, typename U>
-void RBTree<T, U>::deleteBalance(RBNode<T, U>*& node){
-    RBNode<T, U>* w, pNode;
+RBNode<T, U>* RBTree<T, U>::deleteBalance(RBNode<T, U>*& node){
+    RBNode<T, U> * w, * pNode;
     while(1){
         if (node->color >= 90){
             pNode = node;
-            node = node->left ? node->left : node->right;
+            node = node->left ? node->right : node->left;
         }
         else if (node->parent == nullptr || node->color == RED)
             break;
@@ -361,13 +359,78 @@ void RBTree<T, U>::deleteBalance(RBNode<T, U>*& node){
             }
             else {
                 //case 3
-                
+                if (isBlack(w->right)){
+                    w->left->color = BLACK;
+                    w->color = RED;
+                    w = rotate_right(w);
+                    w = pNode->right;
+                } 
+                // case 4
+                w->color = pNode->color;
+                pNode->color = BLACK;
+                if (w->right != nullptr)
+                    w->right->color = BLACK;
+                pNode = rotate_left(pNode);
+                node = pNode;
+                while (node->parent != nullptr){
+                    node->color = node->color % 10;
+                    node = node->parent;
+                }
+            }
+        }
+        else{
+            w = pNode->left;
+
+            // case 1
+            if (w != nullptr && w->color == RED){
+                w->color = BLACK;
+                pNode->color = RED;
+                w = rotate_right(pNode);        
+                pNode = w->right;
+                w = pNode->left;
+            }
+            // case 2
+            if (isBlack(w->left) && isBlack(w->right)){
+                w->color = RED;
+                node = pNode;
+                node->color = node->color % 10;
+            }
+            else {
+                //case 3
+                if (isBlack(w->left)){
+                    w->right->color = BLACK;
+                    w->color = RED;
+                    w = rotate_left(w);
+                    w = pNode->left;
+                } 
+                // case 4
+                w->color = pNode->color;
+                pNode->color = BLACK;
+                if (w->left != nullptr)
+                    w->left->color = BLACK;
+                pNode = rotate_right(pNode);
+                node = pNode;
+                while (node->parent != nullptr){
+                    node->color = node->color % 10;
+                    node = node->parent;
+                }
             }
         }
     }
-    if (node->color == 999){
-        //  to do
+    if (node == nullptr){
+        node = pNode;
+        node->color = node->color % 10;
     }
+    else
+        node->color = BLACK;
+    
+    // make node root
+    while (node->parent != nullptr){
+        node = node->parent;
+    }
+    node->color = BLACK;
+
+    return node;
 }
 
 template<typename T, typename U>
@@ -379,12 +442,13 @@ RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
     if (!nodeToBeDeleted){
         return nodeToBeDeleted;
     }
-    RBNode<T, U>* x, y;
+    RBNode<T, U> * x, * y;
     int originalColor = nodeToBeDeleted->color;
     if (nodeToBeDeleted->left == nullptr && nodeToBeDeleted->right == nullptr){
         x = nodeToBeDeleted->parent;
         // as x is nullptr need to find way to impement in deleteFix(). x->parent leads to error so no way to find sibling(w)
         x->color = 90 + x->color; // exception that need to be added in deleteFix() ---------------------------------------------------------
+        transplant(nodeToBeDeleted, nodeToBeDeleted->right);
     }
     else if (nodeToBeDeleted->left == nullptr){
         x = nodeToBeDeleted->right;
@@ -422,7 +486,7 @@ RBNode<T,U>* RBTree<T,U>::remove(RBNode<T,U>*& node, const T& key) {
     }
     delete nodeToBeDeleted;
     if (originalColor == BLACK)
-        deleteBalance(x);
+        node = deleteBalance(x);
 
     while (node->parent != nullptr){
         node = node->parent;
