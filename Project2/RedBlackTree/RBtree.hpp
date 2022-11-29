@@ -498,7 +498,9 @@ template<typename T, typename U>
 void RBTree<T,U>::removeall(RBNode<T,U>*& node) {
     //TODO
     //for destructor
-        
-    
-    
+    if (node){
+        removeall(node->left);
+        removeall(node->right);
+        delete node;
+    }
 }
