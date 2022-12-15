@@ -108,7 +108,21 @@ void FibonacciHeap<T>::insert(const T& item) {
 template <typename T>
 void FibonacciHeap<T>::insert(std::shared_ptr<FibonacciNode<T>>& node) {
 	// TODO
+    node->left = node;
+    node->right = node;
+    if (get_min_node() == nullptr)
+        min_node = node;
+    else{
+        std::shared_ptr<FibonacciNode<T>> min_node_left = (min_node->left).lock();
+        min_node_left->right = node;
+        node->right = min_node;
+        node->left = min_node->left;
+        min_node->left = node;
+        if (node->key < min_node->key)
+            min_node = node;
 
+    }
+    size_ = size_ + 1;
 }
 
 template <typename T>
@@ -121,13 +135,13 @@ std::optional<T> FibonacciHeap<T>::extract_min() {
 template <typename T>
 void FibonacciHeap<T>::decrease_key(std::shared_ptr<FibonacciNode<T>>& x, T new_key) {
 	// TODO
-
+    return;
 }
 
 template <typename T>
 void FibonacciHeap<T>::remove(std::shared_ptr<FibonacciNode<T>>& x) {
 	// TODO
-	
+	return;
 }
 
 template <typename T>
@@ -137,25 +151,25 @@ void FibonacciHeap<T>::consolidate() {
 	// TODO
 
 	std::vector<std::shared_ptr<FibonacciNode<T>>> A(len, nullptr);
-
+    return;
 }
 
 template <typename T>
 void FibonacciHeap<T>::merge(std::shared_ptr<FibonacciNode<T>>& x, std::shared_ptr<FibonacciNode<T>>& y) {
 	// TODO
-
+    return;
 }
 
 template <typename T>
 void FibonacciHeap<T>::cut(std::shared_ptr<FibonacciNode<T>>& x) {
 	// TODO
-
+    return;
 }
 
 template <typename T>
 void FibonacciHeap<T>::recursive_cut(std::shared_ptr<FibonacciNode<T>>& x) {
 	// TODO
-
+    return;
 }
 
 #endif // __FHEAP_H_
