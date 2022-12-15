@@ -128,7 +128,40 @@ void FibonacciHeap<T>::insert(std::shared_ptr<FibonacciNode<T>>& node) {
 template <typename T>
 std::optional<T> FibonacciHeap<T>::extract_min() {
 	// TODO
-
+    if (get_min_node() != nullptr){
+        T deletedValue = min_node->key;
+        std::shared_ptr<FibonacciNode<T>> temp = min_node;
+        std::shared_ptr<FibonacciNode<T>> rchild;
+        rchild = temp;
+        std::shared_ptr<FibonacciNode<T>> x = nullptr;
+        if (temp->child != nullptr){
+            x = temp->child;
+            do{
+                rchild = x->right;
+                std::shared_ptr<FibonacciNode<T>> min_node_left = (min_node->left).lock();
+                min_node_left->right = x;
+                x->right = min_node;
+                x->left = min_node->left;
+                min_node->left = x;
+                if (x->key < min->key)
+                    min_node = x;
+                x->parent = nullptr;
+                x = rchild;
+            } while (rchild != temp->child)
+        }
+        std::shared_ptr<FibonacciNode<T>> temp_left = (temp->left).lock();
+        temp_left->right = temp->right;
+        temp->right->left = temp->left;
+        min_node = temp->right;
+        if (temp == temp->right && temp->child == nullptr)
+            min_node = nullptr;
+        else{
+            min_node = temp->right;
+            consolidate();
+        }
+        size_ = size_ - 1;
+        return deletedValue;
+    }
 	return std::nullopt;
 }
 
