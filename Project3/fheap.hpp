@@ -266,7 +266,26 @@ void FibonacciHeap<T>::FibonacciLink(std::shared_ptr<FibonacciNode<T>>& to_be_ch
 template <typename T>
 void FibonacciHeap<T>::merge(std::shared_ptr<FibonacciNode<T>>& x, std::shared_ptr<FibonacciNode<T>>& y) {
 	// TODO
-    return;
+    std::shared_ptr<FibonacciNode<T>> temp;
+    if (x->key < y->key){
+        // swap
+        temp = x;
+        x = y;
+        y = temp;
+    }
+    
+    x->parent = y;
+    if (y->child == nullptr)
+        y->child = x;
+    x->right = y->child;
+    x->left = y->child->left;
+    std::shared_ptr<FibonacciNode<T>> y_child_left = (y->child->left).lock();
+    y_child_left->right = x;
+    y->child->left = x;
+    if (x->key < y->child->key)
+        y->child = x;
+    
+    y->degree++;
 }
 
 template <typename T>
