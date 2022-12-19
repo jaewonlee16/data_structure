@@ -82,7 +82,7 @@ class FibonacciHeap : public PriorityQueue<T> {
         void merge(std::shared_ptr<FibonacciNode<T>>& x, std::shared_ptr<FibonacciNode<T>>& y);
 		void cut(std::shared_ptr<FibonacciNode<T>>& x);
 		void recursive_cut(std::shared_ptr<FibonacciNode<T>>& x);
-
+        void FibonacciLink(std::shared_ptr<FibonacciNode<T>>& to_be_child, std::shared_ptr<FibonacciNode<T>>& to_be_parent);
 };
 
 template <typename T>
@@ -183,8 +183,84 @@ void FibonacciHeap<T>::consolidate() {
 	int len = int(log(size_) / log(phi)) + 10;
 	// TODO
 
+    size_t degree_x;
 	std::vector<std::shared_ptr<FibonacciNode<T>>> A(len, nullptr);
-    return;
+    std::shared_ptr<FibonacciNode<T>> x = min_node;
+    std::shared_ptr<FibonacciNode<T>> same_degree_node;
+    std::shared_ptr<FibonacciNode<T>> temp_for_swap;
+
+    do{
+        degree_x = x->degree;
+
+        while (A[degree_x] != nullptr){
+            same_degree_node = A[degree_x];
+            if (x->key > same_degree_node->key){
+                // swap
+                temp_for_swap = x;
+                x = same_degree_node;
+                same_degree_node = temp_for_swap;
+            }
+            if (same_degree_node == min_node)
+                min_node = x;
+            FibonacciLink(same_degree_node, x);
+            if (x->right == x)
+                min_node = x;
+            A[degree_x] = nullptr;
+            degree_x++;
+        }
+        A[degree_x] = x;
+        x = x->right;
+    } while (x != min_node);
+
+    min_node = nullptr;
+    for (int j = 0; j < len; j++){
+        if (A[j] != nullptr){
+            A[j]->left = A[j];
+            A[j]->right = A[j];
+            if (min_node != nullptr){
+                std::shared_ptr<FibonacciNode<T>> min_node_left = (min_node->left).lock();
+                min_node_left->right = A[j];
+                A[j]->right = min_node;
+                A[j]->left = min_node->left;
+                min_node->left = A[j];
+                if (A[j]->key < min_node->key)
+                    min_node = A[j];
+            }
+            else {
+                min_node = A[j];
+            }
+            if (min_node == nullptr)
+                min_node = A[j];
+            else if (A[j]->key < min_node->key)
+                min_node = A[j];
+        }
+    }
+}
+
+template <typename T>
+void FibonacciHeap<T>::FibonacciLink(std::shared_ptr<FibonacciNode<T>>& to_be_child, 
+                                        std::shared_ptr<FibonacciNode<T>>& to_be_parent) {
+    if (to_be_child == to_be_parent)
+        return;
+    
+    std::shared_ptr<FibonacciNode<T>> to_be_child_left = (to_be_child->left).lock();
+    to_be_child_left->right = to_be_child->right;
+    to_be_child->right->left = to_be_child->left;
+    if (to_be_parent->right == to_be_parent)
+        min_node = to_be_parent;
+    to_be_child->left = to_be_child;
+    to_be_child->right = to_be_child;
+    to_be_child->parent = to_be_parent;
+    if (to_be_parent->child == nullptr)
+        to_be_parent->child = to_be_child;
+    to_be_child->right = to_be_parent->child;
+    to_be_child->left = to_be_parent->child->left;
+    std::shared_ptr<FibonacciNode<T>> parent_child_left = (to_be_parent->child->left).lock();
+    parent_child_left->right = to_be_child;
+    to_be_parent->child->left = to_be_child;
+    if (to_be_child->key < to_be_parent->child->key)
+        to_be_parent->child = to_be_child;
+    to_be_parent->degree++;
 }
 
 template <typename T>
