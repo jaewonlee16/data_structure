@@ -143,11 +143,11 @@ std::optional<T> FibonacciHeap<T>::extract_min() {
                 x->right = min_node;
                 x->left = min_node->left;
                 min_node->left = x;
-                if (x->key < min->key)
+                if (x->key < min_node->key)
                     min_node = x;
-                x->parent = nullptr;
+                x->parent = std::weak_ptr<FibonacciNode<T>>();
                 x = rchild;
-            } while (rchild != temp->child)
+            } while (rchild != temp->child);
         }
         std::shared_ptr<FibonacciNode<T>> temp_left = (temp->left).lock();
         temp_left->right = temp->right;
