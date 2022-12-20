@@ -89,6 +89,9 @@ template <typename T>
 FibonacciHeap<T>::~FibonacciHeap() {
 	// TODO
 	// NOTE: Be aware of memory leak or memory error.
+    while (size_ > 0){
+        extract_min();
+    }
 }
 
 template <typename T>
@@ -121,6 +124,7 @@ void FibonacciHeap<T>::insert(std::shared_ptr<FibonacciNode<T>>& node) {
         if (node->key < min_node->key)
             min_node = node;
 
+        // min_node_left = nullptr;  // ????????????
     }
     size_ = size_ + 1;
 }
@@ -130,6 +134,12 @@ std::optional<T> FibonacciHeap<T>::extract_min() {
 	// TODO
     if (get_min_node() != nullptr){
         T deletedValue = min_node->key;
+        if (min_node->right == min_node && min_node->child == nullptr){
+            min_node->right = nullptr;
+            min_node = nullptr;
+            size_ = size_ - 1;
+            return deletedValue;
+        }
         std::shared_ptr<FibonacciNode<T>> temp = min_node;
         std::shared_ptr<FibonacciNode<T>> rchild;
         rchild = temp;
@@ -147,6 +157,7 @@ std::optional<T> FibonacciHeap<T>::extract_min() {
                     min_node = x;
                 x->parent = std::weak_ptr<FibonacciNode<T>>();
                 x = rchild;
+                // min_node_left = nullptr;   // ??????????????????????????
             } while (rchild != temp->child);
         }
         std::shared_ptr<FibonacciNode<T>> temp_left = (temp->left).lock();
@@ -160,6 +171,7 @@ std::optional<T> FibonacciHeap<T>::extract_min() {
             consolidate();
         }
         size_ = size_ - 1;
+        // temp_left = nullptr; // ?????????????????????
         return deletedValue;
     }
 	return std::nullopt;
@@ -216,6 +228,7 @@ void FibonacciHeap<T>::consolidate() {
                 temp_for_swap = x;
                 x = same_degree_node;
                 same_degree_node = temp_for_swap;
+                temp_for_swap = nullptr;
             }
             if (same_degree_node == min_node)
                 min_node = x;
@@ -242,6 +255,7 @@ void FibonacciHeap<T>::consolidate() {
                 min_node->left = A[j];
                 if (A[j]->key < min_node->key)
                     min_node = A[j];
+                // min_node_left = nullptr; // ??????????
             }
             else {
                 min_node = A[j];
@@ -278,6 +292,8 @@ void FibonacciHeap<T>::FibonacciLink(std::shared_ptr<FibonacciNode<T>>& to_be_ch
     if (to_be_child->key < to_be_parent->child->key)
         to_be_parent->child = to_be_child;
     to_be_parent->degree++;
+    // to_be_child_left = nullptr; // ???????????
+    // parent_child_left = nullptr; // ????????
 }
 
 template <typename T>
