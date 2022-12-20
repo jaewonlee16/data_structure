@@ -70,8 +70,23 @@ dijkstra_shortest_path(Graph& g, vertex_t src) {
 
     // TODO
 
-    FibonacciHeap<int> heap = {};
+	dist[src] = 0;
+	FibonacciHeap<edge_weight_t> heap = {};
+	std::shared_ptr<FibonacciNode<edge_weight_t>> *array = new std::shared_ptr<FibonacciNode<edge_weight_t>> [g.get_num_vertices()];
+	for (int i = 0; i < g.get_num_vertices(); i++){
+		array[i] = std::make_shared<FibonacciNode<edge_weight_t>>(dist[i]);
+		heap.insert(array[i]);
+	}
+/*
+    for (int i = 0; i < g.get_num_vertices(); i++){
+		std::cout << array[i]->key << std::endl;
+	}
+*/
 
+	while (!heap.is_empty()){
+		auto it = find(dist.begin(), dist.end(), heap.extract_min());
+		vertex_t u = it - dist.begin();
+	}
 	return M;
 }
 
