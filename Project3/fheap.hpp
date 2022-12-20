@@ -168,13 +168,30 @@ std::optional<T> FibonacciHeap<T>::extract_min() {
 template <typename T>
 void FibonacciHeap<T>::decrease_key(std::shared_ptr<FibonacciNode<T>>& x, T new_key) {
 	// TODO
-    return;
+    if (min_node == nullptr)
+        return;
+    if (x == nullptr)
+        return;
+    if (new_key > x->key)
+        return;
+    
+    x->key = new_key;
+    std::shared_ptr<FibonacciNode<T>> parent_x = x->parent;
+    if (parent_x != nullptr && x->key < parent_x->key){
+        cut(x);
+        recursive_cut(parent_x);
+    }
+    if (x->key < min_node->key)
+        min_node = x;
 }
 
 template <typename T>
 void FibonacciHeap<T>::remove(std::shared_ptr<FibonacciNode<T>>& x) {
 	// TODO
-	return;
+	if (x == nullptr)
+        return;
+    decrease_key(x, -9999);
+    extract_min(x);
 }
 
 template <typename T>
@@ -291,13 +308,40 @@ void FibonacciHeap<T>::merge(std::shared_ptr<FibonacciNode<T>>& x, std::shared_p
 template <typename T>
 void FibonacciHeap<T>::cut(std::shared_ptr<FibonacciNode<T>>& x) {
 	// TODO
-    return;
+    std::shared_ptr<FibonacciNode<T>> parent_x = x->parent;
+    if (x == x->right)
+        parent_x->child = nullptr;
+    
+    std::shared_ptr<FibonacciNode<T>> left_x = (x->left).lock();
+    left_x->right = x->right;
+    x->right->left = x->left;
+    if (x == parent_x->child)
+        parent_x->child = x->right;
+    parent_x->degree--;
+    x->right = x;
+    x->left = x;
+    std::shared_ptr<FibonacciNode<T>> min_node_left = (min_node->left).lock();
+    min_node_left->right = x;
+    x->right = min_node;
+    x->left = min_node->left;
+    min_node->left = x;
+    x->parent = nullptr;
+    x->marked = false;
 }
 
 template <typename T>
 void FibonacciHeap<T>::recursive_cut(std::shared_ptr<FibonacciNode<T>>& x) {
 	// TODO
-    return;
+    std::shared_ptr<FibonacciNode<T>> p_x = x->parent;
+    if (p_x != nullptr){
+        if (x->marked == false)
+             x->marked = true;
+        else{
+            cut(x);
+            recursive_cut(p_x);
+        }
+    } 
+    
 }
 
 #endif // __FHEAP_H_
