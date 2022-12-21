@@ -69,7 +69,8 @@ dijkstra_shortest_path(Graph& g, vertex_t src) {
 	std::vector<edge_weight_t> dist(g.get_num_vertices(), 1e10);
 
     // TODO
-
+	auto previous = std::make_optional(std::make_tuple(src, 0));
+	M[src] = previous;
 	dist[src] = 0;
 	FibonacciHeap<edge_weight_t> heap = {};
 	std::shared_ptr<FibonacciNode<edge_weight_t>> *array = new std::shared_ptr<FibonacciNode<edge_weight_t>> [g.get_num_vertices()];
@@ -77,12 +78,12 @@ dijkstra_shortest_path(Graph& g, vertex_t src) {
 		array[i] = std::make_shared<FibonacciNode<edge_weight_t>>(dist[i]);
 		heap.insert(array[i]);
 	}
-
+	/*
     for (int i = 0; i < g.get_num_vertices(); i++){
-		std::cout << array[i]->key << std::endl;
+		std::cout << array[i]->key << ", ";
 	}
-
-
+	std::cout << std::endl;
+	*/
 	while (!heap.is_empty()){
 		edge_weight_t min_dist = (heap.extract_min()).value();
 		auto it = find(dist.begin(), dist.end(), min_dist);
@@ -91,17 +92,25 @@ dijkstra_shortest_path(Graph& g, vertex_t src) {
 		for (auto i = temp.begin(); i != temp.end(); i++){
 			vertex_t v = std::get<1>(*i);
 			edge_weight_t weight = std::get<2> (*i);
-			std::cout << v << "  " << weight << std::endl;
+			// std::cout << v << "  " << weight << std::endl;
 			if (dist[u] + weight < dist[v]){
 				dist[v] = dist[u] + weight;
-				auto previous = std::make_optional(std::make_tuple(v, weight));
-				M[u] = previous;
+				previous = std::make_optional(std::make_tuple(u, dist[u] + weight));
+				M[v] = previous;
+				
 
 				heap.decrease_key(array[v], dist[u] + weight);
+				/*
+				for (int i = 0; i < g.get_num_vertices(); i++){
+					std::cout << array[i]->key << ", ";
+				}
+				std::cout << v << "     (array)   new key: " << dist[u] + weight <<  std::endl;
+				*/
 			}
 		}
-		std::cout << "finished vertex u: " << u << std::endl;
+		// std::cout << "finished vertex u: " << u << std::endl;
 	}
+	delete [] array;
 	return M;
 }
 
